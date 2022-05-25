@@ -1,18 +1,27 @@
+import * as dotenv from 'dotenv';
+import { resolve } from 'path';
+dotenv.config({ path: resolve(__dirname, '../.env') });
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {ConfigModule} from '@nestjs/config'
 import {TypeOrmModule} from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+
+console.log(process.env.DB_URL)
 
 @Module({
   imports: [
       ConfigModule.forRoot({isGlobal: true}),
       TypeOrmModule.forRoot({
         type: 'postgres',
-        url: process.env.DB_URL || 'postgres://vrgebfrf:GwetlLwFY9_tFsbOH0_HUu3a690Hex6q@abul.db.elephantsql.com/vrgebfrf',
+        url: process.env.DB_URL,
         autoLoadEntities: true,
         synchronize: true
-      })
+      }),
+      UserModule,
+      AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

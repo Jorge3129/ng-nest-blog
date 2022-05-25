@@ -1,12 +1,21 @@
 import {Controller, Delete, Get, Post, Put, Body, Param} from '@nestjs/common';
 import {UserService} from "../service/user.service";
 import {User} from "../models/user.model";
-import {from, Observable} from "rxjs";
+import {from, map, Observable} from "rxjs";
 
 @Controller('user')
 export class UserController {
 
     constructor(private userService: UserService) {
+    }
+
+    @Post('login')
+    login(@Body() user: User): Observable<Object> {
+        return this.userService.login(user).pipe(
+            map((jwt: string) => {
+                return { access_token: jwt };
+            })
+        )
     }
 
     @Post()
