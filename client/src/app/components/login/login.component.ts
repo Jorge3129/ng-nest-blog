@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {Router} from "@angular/router";
+import {map} from "rxjs";
 
 @Component({
   selector: 'app-login',
@@ -8,16 +11,37 @@ import {AuthService} from "../../services/auth.service";
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private authService: AuthService) { }
+  loginForm: FormGroup;
+
+  constructor(
+    private authService: AuthService,
+    private formBuilder: FormBuilder,
+    private router: Router
+  ) {
+    this.loginForm = new FormGroup({
+      email: new FormControl(null,
+        [
+          Validators.required,
+          Validators.email,
+          Validators.minLength(6)
+        ]),
+      password: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(1)
+      ])
+    })
+  }
 
   ngOnInit(): void {
   }
 
-  login() {
-    this.authService.login({
-      email: "a@gmail.com",
-      password: "a"
-    }).subscribe(data => alert("success"))
+  onSubmit() {
+    if(this.loginForm.invalid) {
+      return;
+    }
+    this.authService.login(this.loginForm.value).pipe(
+      map(token => this.router.navigate(['admin']))
+    ).subscribe()
   }
 
 }
